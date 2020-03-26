@@ -55,8 +55,6 @@ var SwaggerModule = /*#__PURE__*/function () {
 
       var swaggerSpecDefinitions = [];
       Object.keys(swaggerSpec.paths).forEach(function (element) {
-        console.log(element, key, swaggerSpec.paths[element]["x-".concat(key)]);
-
         if (swaggerSpec.paths[element]["x-".concat(key)] && !_this.config[key].some(function (p) {
           return swaggerSpec.paths[element]["x-".concat(key)].includes(p);
         })) {
