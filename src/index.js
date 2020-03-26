@@ -91,10 +91,12 @@ class SwaggerModule {
 
   createSwaggerRoute(app) {
     let swaggerSpecAdmin = this.filterAccess(swaggerJSDoc(this.options))
-    app.use('swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpecAdmin))
+    app.use('/_', swaggerUi.serve)
+    app.get('/_', swaggerUi.setup(swaggerSpecAdmin))
 
     let swaggerSpec = this.filterVisibility(swaggerJSDoc(this.options))
-    app.use('_swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+    app.use('/', swaggerUi.serve)
+    app.get('/', swaggerUi.setup(swaggerSpec))
   }
 }
 
