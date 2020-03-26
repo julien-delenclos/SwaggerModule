@@ -17,11 +17,21 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var SwaggerModule = /*#__PURE__*/function () {
+  /**
+   * @param {Object} config
+   * @param {string} config.title Title
+   * @param {string} config.version Version
+   * @param {string} config.basePath Base path
+   * @param {string} config.routesDirectory Absolute path
+   * @param {string[]} config.visibility Array of visibility tag allowed
+   * @param {string[]} config.access Array of access tag allowed
+   */
   function SwaggerModule(config) {
     _classCallCheck(this, SwaggerModule);
 
     this.config = {
-      info: 'Title',
+      title: 'Title',
+      version: '1.0',
       basePath: '/',
       routesDirectory: '',
       visibility: [],
@@ -31,7 +41,10 @@ var SwaggerModule = /*#__PURE__*/function () {
     Object.assign(this.config, config);
     this.options = {
       swaggerDefinition: {
-        info: this.config.info,
+        info: {
+          title: this.config.title,
+          version: this.config.version
+        },
         basePath: this.config.basePath
       },
       apis: [_path["default"].resolve(this.config.routesDirectory) + '/*.js', '../../*.js.LICENSE']
@@ -131,12 +144,22 @@ var SwaggerModule = /*#__PURE__*/function () {
   }, {
     key: "createSwaggerRoute",
     value: function createSwaggerRoute(app) {
-      var swaggerSpecAdmin = this.filterAccess((0, _swaggerJsdoc["default"])(this.options));
-      app.use('/_', _swaggerUiExpress["default"].serve);
-      app.get('/_', _swaggerUiExpress["default"].setup(swaggerSpecAdmin));
       var swaggerSpec = this.filterVisibility((0, _swaggerJsdoc["default"])(this.options));
-      app.use('/', _swaggerUiExpress["default"].serve);
-      app.get('/', _swaggerUiExpress["default"].setup(swaggerSpec));
+      var swaggerSpecAdmin = this.filterAccess((0, _swaggerJsdoc["default"])(this.options));
+      app.get("/swagger.json", function (req, res) {
+        res.setHeader("Content-Type", "application/json");
+        res.send(swaggerSpec);
+      });
+      app.get("/_swagger.json", function (req, res) {
+        res.setHeader("Content-Type", "application/json");
+        res.send(swaggerSpecAdmin);
+      });
+      app.use('/', _swaggerUiExpress["default"].serve, _swaggerUiExpress["default"].setup(null, {
+        explorer: true,
+        swaggerOptions: {
+          url: '/swagger.json'
+        }
+      }));
     }
   }]);
 

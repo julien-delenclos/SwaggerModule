@@ -3,8 +3,10 @@ import swaggerJSDoc from 'swagger-jsdoc'
 import path from 'path'
 
 class SwaggerModule {
+
   config = {
-    info: 'Title',
+    title: 'Title',
+    version: '1.0',
     basePath: '/',
     routesDirectory: '',
     visibility: [],
@@ -13,11 +15,23 @@ class SwaggerModule {
 
   options = {}
 
+  /**
+   * @param {Object} config
+   * @param {string} config.title Title
+   * @param {string} config.version Version
+   * @param {string} config.basePath Base path
+   * @param {string} config.routesDirectory Absolute path
+   * @param {string[]} config.visibility Array of visibility tag allowed
+   * @param {string[]} config.access Array of access tag allowed
+   */
   constructor(config) {
     Object.assign(this.config, config)
     this.options = {
       swaggerDefinition: {
-        info: this.config.info,
+        info: {
+          title: this.config.title,
+          version: this.config.version
+        },
         basePath: this.config.basePath
       },
       apis: [path.resolve(this.config.routesDirectory) + '/*.js', '../../*.js.LICENSE']
@@ -90,13 +104,25 @@ class SwaggerModule {
   }
 
   createSwaggerRoute(app) {
-    let swaggerSpecAdmin = this.filterAccess(swaggerJSDoc(this.options))
-    app.use('/_', swaggerUi.serve)
-    app.get('/_', swaggerUi.setup(swaggerSpecAdmin))
-
     let swaggerSpec = this.filterVisibility(swaggerJSDoc(this.options))
-    app.use('/', swaggerUi.serve)
-    app.get('/', swaggerUi.setup(swaggerSpec))
+    let swaggerSpecAdmin = this.filterAccess(swaggerJSDoc(this.options))
+
+    app.get("/swagger.json", (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.send(swaggerSpec);
+    });
+    
+    app.get("/_swagger.json", (req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.send(swaggerSpecAdmin);
+    });
+
+    app.use('/', swaggerUi.serve, swaggerUi.setup(null, {
+      explorer: true,
+      swaggerOptions: {
+        url: '/swagger.json',
+      }
+    }))
   }
 }
 
