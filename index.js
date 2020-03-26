@@ -132,9 +132,9 @@ var SwaggerModule = /*#__PURE__*/function () {
     key: "createSwaggerRoute",
     value: function createSwaggerRoute(app) {
       var swaggerSpecAdmin = this.filterAccess((0, _swaggerJsdoc["default"])(this.options));
-      app.use('/_', _swaggerUiExpress["default"].serve, _swaggerUiExpress["default"].setup(swaggerSpecAdmin));
+      app.use('swagger', _swaggerUiExpress["default"].serve, _swaggerUiExpress["default"].setup(swaggerSpecAdmin));
       var swaggerSpec = this.filterVisibility((0, _swaggerJsdoc["default"])(this.options));
-      app.use('/', _swaggerUiExpress["default"].serve, _swaggerUiExpress["default"].setup(swaggerSpec));
+      app.use('_swagger', _swaggerUiExpress["default"].serve, _swaggerUiExpress["default"].setup(swaggerSpec));
     }
   }]);
 
